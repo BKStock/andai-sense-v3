@@ -1,0 +1,186 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1775075641323,
+  "projectRoot": "/Users/mr.k/projects/andai-sense-v3",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "16.2.2",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.2.4",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.4",
+        "category": "frontend"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "lint": "eslint"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "app",
+      "public"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 4,
+      "lastAccessed": 1775075641316,
+      "keyFiles": [
+        "favicon.ico",
+        "globals.css",
+        "layout.tsx",
+        "page.tsx"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 5,
+      "lastAccessed": 1775075641316,
+      "keyFiles": [
+        "file.svg",
+        "globe.svg",
+        "next.svg",
+        "vercel.svg",
+        "window.svg"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "app/globals.css",
+      "accessCount": 3,
+      "lastAccessed": 1775075875759,
+      "type": "file"
+    },
+    {
+      "path": "app/layout.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1775075881116,
+      "type": "file"
+    },
+    {
+      "path": "app/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1775075991166,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 1,
+      "lastAccessed": 1775075658358,
+      "type": "file"
+    },
+    {
+      "path": "tsconfig.json",
+      "accessCount": 1,
+      "lastAccessed": 1775075658553,
+      "type": "file"
+    },
+    {
+      "path": "next.config.ts",
+      "accessCount": 1,
+      "lastAccessed": 1775075666738,
+      "type": "file"
+    },
+    {
+      "path": "postcss.config.mjs",
+      "accessCount": 1,
+      "lastAccessed": 1775075666887,
+      "type": "file"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "accessCount": 1,
+      "lastAccessed": 1775075667697,
+      "type": "file"
+    },
+    {
+      "path": "lib/design-system.ts",
+      "accessCount": 1,
+      "lastAccessed": 1775075885071,
+      "type": "file"
+    },
+    {
+      "path": "lib/mock-data.ts",
+      "accessCount": 1,
+      "lastAccessed": 1775075916649,
+      "type": "file"
+    },
+    {
+      "path": "components/layout/ClientLayout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1775075920744,
+      "type": "file"
+    },
+    {
+      "path": "components/layout/Sidebar.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1775075939306,
+      "type": "file"
+    },
+    {
+      "path": "components/layout/TopBar.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1775075955901,
+      "type": "file"
+    },
+    {
+      "path": "components/layout/CommandPalette.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1775075982968,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
