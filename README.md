@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# &AI SENSE
 
-## Getting Started
+> 日本のM&A・ビジネスインテリジェンス。85サイトを24時間自動監視
 
-First, run the development server:
+## 概要
+国内85のM&A・ビジネス情報サイトをリアルタイム監視するインテリジェンスプラットフォーム。
+案件情報の自動収集・分類・スコアリングにより、見逃しゼロを実現する。
+andai-sense（バックエンド）+ andai-sense-v3（フロント）の統合版。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 主な機能
+- 85サイト24時間自動クロール
+- AIによる案件スコアリング・分類
+- 企業マッチングアルゴリズム
+- アラート通知（Slack/LINE）
+- データエクスポート（CSV/API）
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 技術スタック
+- Next.js 15 / TypeScript
+- Python（クローラー）
+- PostgreSQL / Redis
+- OpenAI / Claude API
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## URL
+- 本番: https://bk-sense.ngrok.app
+- Vercel: https://andai-sense-v3.vercel.app
+- 開発: http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ステータス
+🟢 稼働中
