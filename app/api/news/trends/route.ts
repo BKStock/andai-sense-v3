@@ -20,7 +20,7 @@ export async function GET() {
     const topicMap = new Map<string, typeof trendData>();
     trendData.forEach(row => {
       if (!topicMap.has(row.topic)) topicMap.set(row.topic, []);
-      topicMap.get(row.topic)!.push(row);
+      topicMap.get(row.topic)?.push(row);
     });
 
     const trends = Array.from(topicMap.entries()).map(([topic, rows]) => {

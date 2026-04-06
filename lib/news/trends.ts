@@ -48,7 +48,8 @@ export function calculateTrends(): TrendData[] {
 
   allRows.forEach(row => {
     if (!topicMap.has(row.topic)) topicMap.set(row.topic, new Map());
-    topicMap.get(row.topic)!.set(row.date, (topicMap.get(row.topic)!.get(row.date) || 0) + row.count);
+    const dateMap = topicMap.get(row.topic)!;
+    dateMap.set(row.date, (dateMap.get(row.date) || 0) + row.count);
   });
 
   const trends: TrendData[] = [];
