@@ -172,21 +172,31 @@ export default function KeywordsPage() {
 
   const handleDelete = async (id: number) => {
     if (!confirm(L.deleteConfirm)) return;
-    await fetch('/api/news/keywords', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-    fetchKeywords();
+    try {
+      const res = await fetch('/api/news/keywords', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) { setError(lang === 'ja' ? '削除に失敗しました' : 'Delete failed'); return; }
+      await fetchKeywords();
+    } catch {
+      setError(lang === 'ja' ? 'ネットワークエラー' : 'Network error');
+    }
   };
 
   const handleToggle = async (kw: Keyword) => {
-    await fetch('/api/news/keywords', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: kw.id, enabled: kw.enabled ? 0 : 1 }),
-    });
-    fetchKeywords();
+    try {
+      const res = await fetch('/api/news/keywords', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: kw.id, enabled: kw.enabled ? 0 : 1 }),
+      });
+      if (!res.ok) { setError(lang === 'ja' ? '変更に失敗しました' : 'Update failed'); return; }
+      await fetchKeywords();
+    } catch {
+      setError(lang === 'ja' ? 'ネットワークエラー' : 'Network error');
+    }
   };
 
   const startEdit = (kw: Keyword) => {
