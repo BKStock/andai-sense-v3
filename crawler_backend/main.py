@@ -287,7 +287,7 @@ async def run_crawler(target: dict):
     try:
         # クロール開始記録
         cursor = conn.execute(
-            "INSERT INTO crawler_runs (source_url, status, started_at) VALUES (?, ?, ?)",
+            "INSERT INTO crawler_runs (source, status, started_at) VALUES (?, ?, ?)",
             (target["url"], "running", datetime.now().isoformat())
         )
         run_id = cursor.lastrowid
@@ -310,9 +310,9 @@ async def run_crawler(target: dict):
             
             if analysis.get("score", 0) >= 40:  # スコア40以上のみ保存
                 conn.execute("""
-                    INSERT INTO companies 
-                    (name, url, source, description, score, sector, prefecture, 
-                     revenue, reason, crawled_at, raw_text)
+                    INSERT INTO companies
+                    (name, url, source, description, score, sector, prefecture,
+                     revenue, reason, first_seen, last_updated)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     analysis.get("company_name", "不明"),
@@ -325,7 +325,7 @@ async def run_crawler(target: dict):
                     analysis.get("revenue", "不明"),
                     analysis.get("reason", ""),
                     datetime.now().isoformat(),
-                    item["text"][:500]
+                    datetime.now().isoformat(),
                 ))
                 saved += 1
         
@@ -333,7 +333,7 @@ async def run_crawler(target: dict):
         
         # 完了記録
         conn.execute(
-            "UPDATE crawler_runs SET status=?, items_found=?, finished_at=? WHERE id=?",
+            "UPDATE crawler_runs SET status=?, items_new=?, finished_at=? WHERE id=?",
             ("success", saved, datetime.now().isoformat(), run_id)
         )
         conn.commit()
