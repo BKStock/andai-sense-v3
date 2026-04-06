@@ -12,9 +12,8 @@ export async function POST() {
     const { scrapeAllSources } = await import("@/lib/news/scraper");
     const { total, errors } = await scrapeAllSources();
 
-    const threshold = parseInt(
-      (db.prepare("SELECT value FROM settings WHERE key = 'score_threshold'").get() as { value: string })?.value || "70"
-    );
+    const thresholdRow = db.prepare("SELECT value FROM settings WHERE key = 'score_threshold'").get() as { value: string } | undefined;
+    const threshold = parseInt(thresholdRow?.value ?? "70", 10);
 
     const unscoredArticles = db.prepare(`
       SELECT id, title, content FROM articles 

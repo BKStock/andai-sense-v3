@@ -40,6 +40,9 @@ export async function DELETE(req: NextRequest) {
   try {
     const db = getDb();
     const { id } = await req.json();
+    if (!Number.isInteger(id) || id <= 0) {
+      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+    }
     db.prepare("DELETE FROM sources WHERE id = ?").run(id);
     return NextResponse.json({ success: true });
   } catch (error) {

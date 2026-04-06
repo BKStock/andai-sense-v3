@@ -47,6 +47,9 @@ export async function DELETE(req: NextRequest) {
   try {
     const db = getDb();
     const { id } = await req.json();
+    if (!Number.isInteger(id) || id <= 0) {
+      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+    }
     db.prepare("DELETE FROM keyword_matches WHERE keyword_id = ?").run(id);
     db.prepare("DELETE FROM keywords WHERE id = ?").run(id);
     return NextResponse.json({ success: true });

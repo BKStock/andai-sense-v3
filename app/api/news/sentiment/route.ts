@@ -8,7 +8,10 @@ export async function GET(req: NextRequest) {
     seedDatabase();
 
     const { searchParams } = new URL(req.url);
-    const days = parseInt(searchParams.get("days") || "30");
+    // Validate days to prevent SQL injection via string interpolation
+    const rawDays = parseInt(searchParams.get("days") || "30", 10);
+    const days = Number.isFinite(rawDays) && rawDays > 0 && rawDays <= 365 ? rawDays : 30;
+    const daysParam = `-${days} days`;
     const view = searchParams.get("view") || "category";
 
     if (view === "keyword") {
@@ -16,10 +19,10 @@ export async function GET(req: NextRequest) {
         SELECT date, keyword, positive_count, neutral_count, negative_count, avg_score
         FROM sentiment_history
         WHERE category = 'keyword'
-          AND date >= date('now', '-${days} days')
+          AND date >= date('now', ?)
           AND keyword IS NOT NULL
         ORDER BY date
-      `).all();
+      `).all(daysParam);
       return NextResponse.json({ data, view });
     }
 
@@ -27,9 +30,9 @@ export async function GET(req: NextRequest) {
       SELECT date, category, positive_count, neutral_count, negative_count, avg_score
       FROM sentiment_history
       WHERE category != 'keyword'
-        AND date >= date('now', '-${days} days')
+        AND date >= date('now', ?)
       ORDER BY date
-    `).all();
+    `).all(daysParam);
 
     const realtimeSentiment = db.prepare(`
       SELECT 

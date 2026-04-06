@@ -45,9 +45,10 @@ export async function GET(req: NextRequest) {
       LIMIT ? OFFSET ?
     `).all(...params, limit, offset);
 
-    const total = (db.prepare(`
+    const countResult = db.prepare(`
       SELECT COUNT(*) as count FROM articles a ${where}
-    `).get(...params) as { count: number }).count;
+    `).get(...params) as { count: number } | undefined;
+    const total = countResult?.count ?? 0;
 
     return NextResponse.json({ articles, total, page, limit });
   } catch (error) {

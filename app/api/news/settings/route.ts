@@ -6,9 +6,9 @@ export async function GET() {
   try {
     const db = getDb();
     seedDatabase();
-    const rows = db.prepare("SELECT key, value FROM settings").all() as { key: string; value: string }[];
+    const rows = db.prepare("SELECT key, value FROM settings").all() as { key: string; value: string | null }[];
     const settings: Record<string, string> = {};
-    rows.forEach(({ key, value }) => { settings[key] = value; });
+    rows.forEach(({ key, value }) => { if (key && value != null) settings[key] = value; });
     return NextResponse.json({ settings });
   } catch (error) {
     console.error(error);
