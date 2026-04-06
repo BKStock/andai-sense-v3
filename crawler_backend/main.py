@@ -446,7 +446,7 @@ async def get_statistics():
 async def get_trending():
     """スコア急上昇企業"""
     conn = get_db()
-    conn.row_factory = __import__('sqlite3').Row
+    conn.row_factory = sqlite3.Row
     rows = [dict(r) for r in conn.execute("""
         SELECT c.*, 
                (SELECT COUNT(*) FROM company_history WHERE company_id=c.id) as history_count
