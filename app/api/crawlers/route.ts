@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
+import { BACKEND_BASE } from '@/lib/config'
 
 export async function GET() {
   try {
-    const res = await fetch('http://localhost:8002/api/crawlers/status', {
+    const res = await fetch(`${BACKEND_BASE}/api/crawlers/status`, {
       cache: 'no-store',
       signal: AbortSignal.timeout(5000),
     })
@@ -14,7 +15,7 @@ export async function GET() {
 
 export async function POST() {
   try {
-    const res = await fetch('http://localhost:8002/api/crawlers/run-all', {
+    const res = await fetch(`${BACKEND_BASE}/api/crawlers/run-all`, {
       method: 'POST',
       signal: AbortSignal.timeout(30000),
     })

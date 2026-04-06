@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useApp } from '@/lib/theme-context';
+import { formatRelativeTime } from '@/lib/utils';
 import { ScoreBadge } from '@/components/news/ScoreBadge';
 import { SentimentBadge } from '@/components/news/SentimentBadge';
 import { motion } from 'framer-motion';
@@ -24,17 +25,6 @@ interface Article {
 
 const CATEGORIES = ['', 'technology', 'business', 'finance', 'news', 'environment', 'other'];
 const SENTIMENTS = ['', 'positive', 'neutral', 'negative'];
-
-function formatRelativeTime(dateStr: string): string {
-  if (!dateStr) return '—';
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return `${Math.floor(diff / 86400)}d ago`;
-}
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -259,7 +249,7 @@ export default function ArticlesPage() {
                   {article.sentiment && <SentimentBadge sentiment={article.sentiment} />}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', paddingTop: 2 }}>
-                  {formatRelativeTime(article.published_at)}
+                  {formatRelativeTime(article.published_at, lang)}
                 </div>
               </motion.div>
             ))}

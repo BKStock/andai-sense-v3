@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/news/db";
+import { BACKEND_BASE } from "@/lib/config";
 
 export async function GET() {
   try {
@@ -28,7 +29,7 @@ export async function GET() {
     let crawlerOnline = false;
 
     try {
-      const res = await fetch("http://localhost:8002/api/stats", {
+      const res = await fetch(`${BACKEND_BASE}/api/stats`, {
         cache: "no-store",
         signal: AbortSignal.timeout(3000),
       });

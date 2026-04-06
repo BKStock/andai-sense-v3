@@ -463,8 +463,9 @@ export default function CompanyDetail() {
   const company = companies.find(c => c.id === id) ?? companies[0];
   const [thesisOpen, setThesisOpen] = useState(false);
 
+  const revenueStartYear = new Date().getFullYear() - company.revenue.length + 1;
   const revenueData = company.revenue.map((v, i) => ({
-    year: `${2020 + i}`,
+    year: `${revenueStartYear + i}`,
     revenue: v,
   }));
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { formatRelativeTime } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Play, Pause, RefreshCw, Globe, AlertCircle, Clock, Wifi, WifiOff } from 'lucide-react';
 
@@ -52,16 +53,6 @@ const statusIcon: Record<Crawler['status'], React.ReactNode> = {
   idle: <Clock size={12} />,
 };
 
-function formatRelativeTime(dateStr: string | null): string {
-  if (!dateStr) return '—';
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return dateStr;
-  const diff = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (diff < 60) return `${diff}秒前`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}分前`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}時間前`;
-  return `${Math.floor(diff / 86400)}日前`;
-}
 
 export default function CrawlersPage() {
   const [crawlers, setCrawlers] = useState<Crawler[]>(INITIAL_CRAWLERS);

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-
-const BACKEND = "http://localhost:8002";
+import { BACKEND_BASE as BACKEND } from "@/lib/config";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

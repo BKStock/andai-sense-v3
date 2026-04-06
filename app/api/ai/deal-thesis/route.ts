@@ -35,7 +35,8 @@ export async function POST(request: Request) {
   }
 
   const signalJa = company.signals.map(s => SIGNAL_LABELS[s] || s).join('、');
-  const revenueStr = company.revenue.map((v, i) => `${2020 + i}年: ${v}百万円`).join('、');
+  const revenueStartYear = new Date().getFullYear() - company.revenue.length + 1;
+  const revenueStr = company.revenue.map((v, i) => `${revenueStartYear + i}年: ${v}百万円`).join('、');
   const lastRevenue = company.revenue[company.revenue.length - 1];
   const peakRevenue = Math.max(...company.revenue);
 

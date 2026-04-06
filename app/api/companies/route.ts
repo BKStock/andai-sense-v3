@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { BACKEND_BASE } from '@/lib/config'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -8,7 +9,7 @@ export async function GET(request: Request) {
   const minScore = Number.isFinite(rawMinScore) ? Math.max(rawMinScore, 0) : 0
 
   try {
-    const res = await fetch(`http://localhost:8002/api/companies?limit=${limit}&min_score=${minScore}`, {
+    const res = await fetch(`${BACKEND_BASE}/api/companies?limit=${limit}&min_score=${minScore}`, {
       cache: 'no-store',
       signal: AbortSignal.timeout(5000),
     })
