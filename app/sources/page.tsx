@@ -136,6 +136,7 @@ export default function SourcesPage() {
         body: JSON.stringify(form),
       });
       if (res.ok) { resetForm(); setShowAdd(false); fetchSources(); }
+      else { setError(lang === 'ja' ? '追加に失敗しました' : 'Failed to add source'); }
     } finally { setSaving(false); }
   };
 
@@ -149,6 +150,7 @@ export default function SourcesPage() {
         body: JSON.stringify({ id, ...form }),
       });
       if (res.ok) { setEditId(null); resetForm(); fetchSources(); }
+      else { setError(lang === 'ja' ? '更新に失敗しました' : 'Failed to update source'); }
     } finally { setSaving(false); }
   };
 

@@ -136,6 +136,8 @@ export default function KeywordsPage() {
         resetForm();
         setShowAdd(false);
         fetchKeywords();
+      } else {
+        setError(lang === 'ja' ? '追加に失敗しました' : 'Failed to add keyword');
       }
     } finally {
       setSaving(false);
@@ -164,6 +166,8 @@ export default function KeywordsPage() {
         setEditId(null);
         resetForm();
         fetchKeywords();
+      } else {
+        setError(lang === 'ja' ? '更新に失敗しました' : 'Failed to update keyword');
       }
     } finally {
       setSaving(false);
