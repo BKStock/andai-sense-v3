@@ -181,5 +181,5 @@ export function seedDatabase() {
     insertSetting.run(key, value);
   });
 
-  console.log("Database seeded successfully");
+  // Seeding complete (log removed for production)
 }

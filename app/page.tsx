@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Wifi, WifiOff } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { CRAWLER_POLL_INTERVAL_MS } from '@/lib/config';
 
 interface DashboardStats {
   alerts_today: number;
@@ -45,7 +46,7 @@ function useStats() {
       } catch {
         setCrawlerOnline(false);
       }
-    }, 30_000);
+    }, CRAWLER_POLL_INTERVAL_MS);
 
     return () => clearInterval(healthInterval);
   }, []);

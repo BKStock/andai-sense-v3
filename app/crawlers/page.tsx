@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { formatRelativeTime } from '@/lib/utils';
+import { CRAWLER_POLL_INTERVAL_MS } from '@/lib/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Play, Pause, RefreshCw, Globe, AlertCircle, Clock, Wifi, WifiOff } from 'lucide-react';
 
@@ -105,7 +106,7 @@ export default function CrawlersPage() {
 
   useEffect(() => {
     fetchBackendStatus();
-    const interval = setInterval(fetchBackendStatus, 30_000);
+    const interval = setInterval(fetchBackendStatus, CRAWLER_POLL_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [fetchBackendStatus]);
 
