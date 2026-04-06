@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { FileText, TrendingUp, RefreshCw, AlertTriangle, Filter } from 'lucide-react';
 import { useApp } from '@/lib/theme-context';
+import { BACKEND_BASE } from '@/lib/config';
 
 interface EdinetSignal {
   id: number;
@@ -130,7 +131,7 @@ export default function EdinetPage() {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      await fetch('http://localhost:8002/api/edinet/run', { method: 'POST', cache: 'no-store' });
+      await fetch(`${BACKEND_BASE}/api/edinet/run`, { method: 'POST', cache: 'no-store' });
       await new Promise(r => setTimeout(r, 2000));
       await fetchSignals(filter);
     } catch {
