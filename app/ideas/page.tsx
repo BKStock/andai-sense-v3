@@ -35,7 +35,7 @@ const categoryIcon: Record<Exclude<IdeaCategory, 'ALL'>, React.ReactNode> = {
 };
 
 const categoryColor: Record<Exclude<IdeaCategory, 'ALL'>, string> = {
-  'アプローチ': 'var(--cyan)',
+  'アプローチ': 'var(--cyan-300)',
   '分析手法': 'var(--green)',
   'ツール改善': 'var(--amber)',
   'データ源': '#8B5CF6',
@@ -87,7 +87,7 @@ export default function IdeasPage() {
             display: 'flex', alignItems: 'center', gap: '7px',
             padding: '9px 16px', borderRadius: '8px', cursor: 'pointer',
             background: 'rgba(0,229,255,0.12)', border: '1px solid rgba(0,229,255,0.3)',
-            color: 'var(--cyan)', fontSize: '12px', fontWeight: 600,
+            color: 'var(--cyan-300)', fontSize: '12px', fontWeight: 600,
           }}
         >
           <Plus size={13} /> アイデア追加
@@ -104,7 +104,7 @@ export default function IdeasPage() {
               padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
               background: filter === f ? (f === 'ALL' ? 'rgba(0,229,255,0.15)' : `${categoryColor[f as Exclude<IdeaCategory, 'ALL'>]}18`) : 'var(--bg-surface)',
               border: `1px solid ${filter === f ? (f === 'ALL' ? 'rgba(0,229,255,0.4)' : categoryColor[f as Exclude<IdeaCategory, 'ALL'>]) : 'var(--border-default)'}`,
-              color: filter === f ? (f === 'ALL' ? 'var(--cyan)' : categoryColor[f as Exclude<IdeaCategory, 'ALL'>]) : 'var(--text-secondary)',
+              color: filter === f ? (f === 'ALL' ? 'var(--cyan-300)' : categoryColor[f as Exclude<IdeaCategory, 'ALL'>]) : 'var(--text-secondary)',
               transition: 'all 150ms',
             }}
           >
@@ -167,7 +167,7 @@ export default function IdeasPage() {
                   style={{
                     padding: '8px 20px', borderRadius: '6px', cursor: 'pointer',
                     background: 'rgba(0,229,255,0.15)', border: '1px solid rgba(0,229,255,0.3)',
-                    color: 'var(--cyan)', fontSize: '12px', fontWeight: 600,
+                    color: 'var(--cyan-300)', fontSize: '12px', fontWeight: 600,
                   }}
                 >
                   追加

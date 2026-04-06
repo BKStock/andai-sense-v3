@@ -8,10 +8,11 @@ import httpx
 import asyncio
 import sqlite3
 import json
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
-EDINET_API_KEY = "edb_e907f67ee166cde0e61e4f8fecfa0ac1"
+EDINET_API_KEY = os.environ.get("EDINET_API_KEY", "")
 EDINET_BASE = "https://api.edinet-fsa.go.jp/api/v2"
 
 # M&Aシグナルとなる書類タイプ
