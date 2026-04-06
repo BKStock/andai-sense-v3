@@ -58,6 +58,7 @@ Respond ONLY with valid JSON, no markdown.`,
         response_format: { type: "json_object" },
         temperature: 0.3,
       }),
+      signal: AbortSignal.timeout(30_000),
     });
 
     if (!response.ok) {
@@ -65,7 +66,9 @@ Respond ONLY with valid JSON, no markdown.`,
     }
 
     const data = await response.json();
-    const result = JSON.parse(data.choices[0].message.content);
+    const content0 = (data.choices as Array<{ message: { content: string } }> | undefined)?.[0]?.message?.content;
+    if (!content0) throw new Error("Empty OpenRouter response");
+    const result = JSON.parse(content0);
 
     return {
       score: Math.min(100, Math.max(0, result.score || 50)),
@@ -147,12 +150,15 @@ Respond with a JSON object containing: title (string), content (markdown string 
         response_format: { type: "json_object" },
         temperature: 0.5,
       }),
+      signal: AbortSignal.timeout(30_000),
     });
 
     if (!response.ok) throw new Error("API error");
 
     const data = await response.json();
-    const result = JSON.parse(data.choices[0].message.content);
+    const content0 = (data.choices as Array<{ message: { content: string } }> | undefined)?.[0]?.message?.content;
+    if (!content0) throw new Error("Empty OpenRouter response");
+    const result = JSON.parse(content0);
 
     return {
       title: result.title,
