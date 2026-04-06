@@ -29,12 +29,16 @@ export async function POST(req: NextRequest) {
       related_terms = [], exclude_terms = [], priority = 1, color = "#6366f1"
     } = body;
 
-    if (!term) return NextResponse.json({ error: "Term required" }, { status: 400 });
+    if (!term || typeof term !== 'string') {
+      return NextResponse.json({ error: "Term required" }, { status: 400 });
+    }
+    const safeRelated = Array.isArray(related_terms) ? related_terms : [];
+    const safeExcluded = Array.isArray(exclude_terms) ? exclude_terms : [];
 
     const result = db.prepare(`
       INSERT INTO keywords (term, category, condition_type, related_terms, exclude_terms, priority, color)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(term, category, condition_type, JSON.stringify(related_terms), JSON.stringify(exclude_terms), priority, color);
+    `).run(term, category, condition_type, JSON.stringify(safeRelated), JSON.stringify(safeExcluded), priority, color);
 
     return NextResponse.json({ id: result.lastInsertRowid, success: true });
   } catch (error) {
@@ -72,10 +76,15 @@ export async function PATCH(req: NextRequest) {
     if (enabled !== undefined) {
       db.prepare("UPDATE keywords SET enabled = ? WHERE id = ?").run(enabled ? 1 : 0, id);
     } else {
+      if (!term || typeof term !== 'string') {
+        return NextResponse.json({ error: "term is required" }, { status: 400 });
+      }
+      const safeRelated = Array.isArray(related_terms) ? related_terms : [];
+      const safeExcluded = Array.isArray(exclude_terms) ? exclude_terms : [];
       db.prepare(`
         UPDATE keywords SET term=?, category=?, condition_type=?, related_terms=?, exclude_terms=?, priority=?, color=?
         WHERE id = ?
-      `).run(term, category, condition_type, JSON.stringify(related_terms), JSON.stringify(exclude_terms), priority, color, id);
+      `).run(term, category, condition_type, JSON.stringify(safeRelated), JSON.stringify(safeExcluded), priority, color, id);
     }
 
     return NextResponse.json({ success: true });

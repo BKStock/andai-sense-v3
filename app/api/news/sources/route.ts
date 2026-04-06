@@ -24,6 +24,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Name and URL required" }, { status: 400 });
     }
 
+    try {
+      const parsed = new URL(url as string);
+      if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error();
+    } catch {
+      return NextResponse.json({ error: "Invalid URL format" }, { status: 400 });
+    }
+
     const result = db.prepare(`
       INSERT INTO sources (name, url, type, category, language, enabled)
       VALUES (?, ?, ?, ?, ?, 1)
