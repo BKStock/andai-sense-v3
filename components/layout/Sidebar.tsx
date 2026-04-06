@@ -9,10 +9,13 @@ const navItems = [
   { icon: '🗺️', label: '地図', href: '/map' },
   { icon: '🎯', label: 'マッチング', href: '/matching' },
   { icon: '📨', label: '問い合わせ', href: '/outreach' },
+  { icon: '🏗️', label: 'パイプライン', href: '/pipeline' },
+  { icon: '📋', label: 'EDINETシグナル', href: '/edinet' },
   { icon: '💡', label: 'アイデア', href: '/ideas' },
   { icon: '📊', label: 'レポート', href: '/reports' },
   { icon: '⚙️', label: 'クローラー', href: '/crawler' },
   { icon: '🔔', label: 'アラート', href: '/alerts' },
+  { icon: '🏠', label: '相続リード', href: '/souzoku' },
 ];
 
 export default function Sidebar() {
