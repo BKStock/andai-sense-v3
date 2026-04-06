@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   const body = (await request.json()) as { company?: CompanyData };
   const { company } = body;
 
-  if (!company?.name || !Array.isArray(company.signals) || !Array.isArray(company.revenue)) {
+  if (!company?.name || !Array.isArray(company.signals) || !Array.isArray(company.revenue) || company.revenue.length === 0) {
     return NextResponse.json({ error: 'Invalid company data' }, { status: 400 });
   }
 

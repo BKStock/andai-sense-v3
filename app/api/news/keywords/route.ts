@@ -65,6 +65,10 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const { id, term, category, condition_type, related_terms, exclude_terms, priority, color, enabled } = body;
 
+    if (!Number.isInteger(id) || id <= 0) {
+      return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+    }
+
     if (enabled !== undefined) {
       db.prepare("UPDATE keywords SET enabled = ? WHERE id = ?").run(enabled ? 1 : 0, id);
     } else {
