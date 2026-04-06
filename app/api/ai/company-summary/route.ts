@@ -68,7 +68,10 @@ M&Aスコア: ${company.score}/100
       return NextResponse.json({ error: 'Ollama API error' }, { status: 502 });
     }
 
-    const data = (await response.json()) as { response: string };
+    const data = (await response.json()) as { response?: string };
+    if (!data.response) {
+      return NextResponse.json({ error: 'Invalid Ollama response' }, { status: 502 });
+    }
     return NextResponse.json({ summary: data.response });
   } catch (error) {
     console.error('[AI company-summary]', error instanceof Error ? error.message : error);

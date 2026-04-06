@@ -16,19 +16,30 @@ export async function GET() {
   }
 }
 
+const ALLOWED_SETTINGS_KEYS = new Set([
+  'score_threshold', 'min_ai_score', 'briefing_time_morning', 'briefing_time_evening',
+  'briefing_enabled', 'scrape_interval', 'crawl_interval', 'notification_channels',
+  'alert_channels', 'telegram_enabled', 'email_enabled', 'webhook_enabled',
+  'notification_email', 'slack_webhook_url', 'language', 'language_filter',
+  'theme', 'max_articles_per_briefing', 'max_articles_per_run', 'digest_enabled',
+  'digest_time', 'ollama_host', 'ollama_model',
+]);
+
 export async function POST(req: NextRequest) {
   try {
     const db = getDb();
-    const body = await req.json();
+    const body = (await req.json()) as Record<string, unknown>;
 
     const upsert = db.prepare(`
       INSERT INTO settings (key, value, updated_at) VALUES (?, ?, datetime('now'))
       ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at
     `);
 
-    const upsertMany = db.transaction((settings: Record<string, string>) => {
+    const upsertMany = db.transaction((settings: Record<string, unknown>) => {
       for (const [key, value] of Object.entries(settings)) {
-        upsert.run(key, String(value));
+        if (ALLOWED_SETTINGS_KEYS.has(key)) {
+          upsert.run(key, String(value));
+        }
       }
     });
 
