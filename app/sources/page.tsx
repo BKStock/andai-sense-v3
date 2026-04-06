@@ -184,12 +184,15 @@ export default function SourcesPage() {
   const handleFetchNow = async (s: Source) => {
     setFetchingId(s.id);
     try {
-      await fetch('/api/news/scrape', {
+      const res = await fetch('/api/news/scrape', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sourceId: s.id }),
       });
+      if (!res.ok) { setError(lang === 'ja' ? '取得に失敗しました' : 'Fetch failed'); return; }
       await fetchSources();
+    } catch {
+      setError(lang === 'ja' ? 'ネットワークエラー' : 'Network error');
     } finally {
       setFetchingId(null);
     }
