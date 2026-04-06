@@ -165,7 +165,7 @@ export default function ArticlesPage() {
             <input
               type="range" min={0} max={100} step={5}
               value={minScore}
-              onChange={e => { setMinScore(parseInt(e.target.value)); setPage(1); }}
+              onChange={e => { setMinScore(parseInt(e.target.value, 10)); setPage(1); }}
               style={{ width: 140 }}
             />
           </div>
