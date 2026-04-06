@@ -90,18 +90,6 @@ export function getRandomSignal() {
   };
 }
 
-export const ideas = [
-  { id: 1, title: "愛知県建設業M&Aレポート", body: "愛知県内の建設業に特化した売却予測レポートを月次で自動生成する", priority: "HIGH", tags: ["M&A", "レポート", "建設"] },
-  { id: 2, title: "AIスコアリング改善", body: "LLMを活用した企業スコアリングモデルの精度向上プロジェクト", priority: "HIGH", tags: ["テクノロジー", "AI"] },
-  { id: 3, title: "新規シグナルソース追加", body: "帝国データバンクAPIとの連携で倒産予測精度を向上", priority: "MEDIUM", tags: ["データ", "テクノロジー"] },
-  { id: 4, title: "バトンズ連携強化", body: "バトンズ掲載企業の自動マッチング機能を実装", priority: "HIGH", tags: ["M&A", "マッチング"] },
-  { id: 5, title: "地域別市場分析ダッシュボード", body: "都道府県別のM&A市場動向を可視化するサブダッシュボード", priority: "MEDIUM", tags: ["市場分析", "可視化"] },
-  { id: 6, title: "自動メール文面生成", body: "企業プロフィールに基づいたパーソナライズドメール自動生成", priority: "LOW", tags: ["テクノロジー", "営業"] },
-  { id: 7, title: "競合クローラー追加", body: "M&Aキャピタルパートナーズなど競合のプレスリリースを監視", priority: "MEDIUM", tags: ["データ", "競合"] },
-  { id: 8, title: "Slack通知最適化", body: "アラート通知の優先度に基づくSlackチャンネル振り分け", priority: "LOW", tags: ["テクノロジー", "通知"] },
-  { id: 9, title: "決算書AI解析", body: "アップロードされた決算書をAIで自動解析し企業スコアに反映", priority: "HIGH", tags: ["AI", "データ"] },
-];
-
 export const outreachDrafts = [
   { id: 1, company: "有限会社田中建設", subject: "事業承継のご相談", preview: "突然のご連絡失礼いたします。御社の事業承継について...", date: "2024-03-28", status: "draft" as const },
   { id: 2, company: "株式会社山田製造", subject: "M&Aアドバイザリーのご提案", preview: "貴社の製造技術の素晴らしさに注目しております...", date: "2024-03-28", status: "draft" as const },

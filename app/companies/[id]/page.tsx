@@ -10,6 +10,38 @@ import {
 } from 'recharts';
 import { useState, useCallback, useMemo } from 'react';
 
+// Shared hook for AI generate-on-demand endpoints
+function useAIFetch(endpoint: string, resultField: string, errorMsg: string) {
+  const [result, setResult] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const generate = useCallback(async (payload: Record<string, unknown>) => {
+    setLoading(true);
+    setError('');
+    setResult('');
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = (await res.json()) as Record<string, string | undefined>;
+      if (!res.ok || data.error) {
+        setError(data.error ?? errorMsg);
+      } else {
+        setResult(data[resultField] ?? '');
+      }
+    } catch {
+      setError('AIサービスに接続できませんでした');
+    } finally {
+      setLoading(false);
+    }
+  }, [endpoint, resultField, errorMsg]);
+
+  return { result, loading, error, generate };
+}
+
 // Deterministic "random" for signal strength bars (avoids Math.random in render)
 function signalHash(signal: string, companyId: number): number {
   let h = companyId * 31;
@@ -198,33 +230,9 @@ function MultiFactorBreakdown({ score, signals }: { score: number; signals: stri
 
 // --- AI Summary Section ---
 function AISummarySection({ company }: { company: ReturnType<typeof companies['find']> }) {
-  const [summary, setSummary] = useState<string>('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>('');
-
-  const generate = useCallback(async () => {
-    if (!company) return;
-    setLoading(true);
-    setError('');
-    setSummary('');
-    try {
-      const res = await fetch('/api/ai/company-summary', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ company }),
-      });
-      const data = (await res.json()) as { summary?: string; error?: string };
-      if (!res.ok || data.error) {
-        setError(data.error ?? 'AI分析に失敗しました');
-      } else {
-        setSummary(data.summary ?? '');
-      }
-    } catch {
-      setError('AIサービスに接続できませんでした');
-    } finally {
-      setLoading(false);
-    }
-  }, [company]);
+  const { result: summary, loading, error, generate } = useAIFetch(
+    '/api/ai/company-summary', 'summary', 'AI分析に失敗しました'
+  );
 
   return (
     <div className="card" style={{ padding: 24, marginTop: 24, borderLeft: '4px solid var(--cyan-300)' }}>
@@ -233,7 +241,7 @@ function AISummarySection({ company }: { company: ReturnType<typeof companies['f
           AI COMPANY ANALYSIS
         </div>
         <button
-          onClick={generate}
+          onClick={() => company && generate({ company })}
           disabled={loading}
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
@@ -302,33 +310,9 @@ function DealThesisModal({
   company: ReturnType<typeof companies['find']>;
   onClose: () => void;
 }) {
-  const [thesis, setThesis] = useState<string>('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>('');
-
-  const generate = useCallback(async () => {
-    if (!company) return;
-    setLoading(true);
-    setError('');
-    setThesis('');
-    try {
-      const res = await fetch('/api/ai/deal-thesis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ company }),
-      });
-      const data = (await res.json()) as { thesis?: string; error?: string };
-      if (!res.ok || data.error) {
-        setError(data.error ?? 'ディールサマリー生成に失敗しました');
-      } else {
-        setThesis(data.thesis ?? '');
-      }
-    } catch {
-      setError('AIサービスに接続できませんでした');
-    } finally {
-      setLoading(false);
-    }
-  }, [company]);
+  const { result: thesis, loading, error, generate } = useAIFetch(
+    '/api/ai/deal-thesis', 'thesis', 'ディールサマリー生成に失敗しました'
+  );
 
   return (
     <div
@@ -373,7 +357,7 @@ function DealThesisModal({
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button
-              onClick={generate}
+              onClick={() => company && generate({ company })}
               disabled={loading}
               style={{
                 display: 'flex', alignItems: 'center', gap: 8,
