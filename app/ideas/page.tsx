@@ -231,7 +231,7 @@ export default function IdeasPage() {
                     fontSize: '11px', color: 'var(--text-secondary)',
                   }}
                 >
-                  ▲ <span style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>{idea.votes}</span>
+                  ▲ <span style={{ fontFamily: 'var(--font-mono)' }}>{idea.votes}</span>
                 </button>
               </div>
             </motion.div>

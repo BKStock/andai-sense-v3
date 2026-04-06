@@ -34,10 +34,10 @@ export function AICopilot() {
 
   return (
     <div className="fixed bottom-4 right-4 w-80 rounded-xl shadow-2xl overflow-hidden"
-         style={{ background: 'var(--bg-raised)', border: '1px solid var(--border)' }}>
+         style={{ background: 'var(--bg-raised)', border: '1px solid var(--border-default)' }}>
       {/* Header */}
       <div className="px-4 py-3 flex items-center gap-2"
-           style={{ background: 'var(--primary)', color: 'white' }}>
+           style={{ background: 'var(--cyan-300)', color: 'white' }}>
         <span>🤖</span>
         <span className="font-semibold text-sm">AI コパイロット</span>
         <span className="ml-auto text-xs opacity-70">page-agent</span>
@@ -62,14 +62,14 @@ export function AICopilot() {
           style={{ 
             background: 'var(--bg-surface)',
             color: 'var(--text-primary)',
-            border: '1px solid var(--border)'
+            border: '1px solid var(--border-default)'
           }}
         />
         <button
           onClick={handleExecute}
           disabled={isRunning}
           className="px-3 py-2 rounded-lg text-xs font-medium text-white disabled:opacity-50"
-          style={{ background: 'var(--accent)' }}
+          style={{ background: 'var(--cyan-300)' }}
         >
           {isRunning ? '...' : '実行'}
         </button>

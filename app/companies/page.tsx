@@ -72,11 +72,11 @@ export default function CompaniesPage() {
               onClick={() => setUrgencyFilter(u)}
               style={{
                 fontSize: '11px', fontWeight: 600, padding: '5px 11px', borderRadius: '6px', cursor: 'pointer',
-                fontFamily: 'var(--font-jetbrains-mono)', letterSpacing: '0.05em', transition: 'all 150ms',
+                fontFamily: 'var(--font-mono)', letterSpacing: '0.05em', transition: 'all 150ms',
                 background: urgencyFilter === u ? (u === 'ALL' ? 'rgba(0,229,255,0.1)' : `${urgencyColor[u]}18`) : 'transparent',
                 borderWidth: '1px', borderStyle: 'solid',
-                borderColor: urgencyFilter === u ? (u === 'ALL' ? 'var(--cyan)' : urgencyColor[u]) : 'var(--border-default)',
-                color: urgencyFilter === u ? (u === 'ALL' ? 'var(--cyan)' : urgencyColor[u]) : 'var(--text-muted)',
+                borderColor: urgencyFilter === u ? (u === 'ALL' ? 'var(--cyan-300)' : urgencyColor[u]) : 'var(--border-default)',
+                color: urgencyFilter === u ? (u === 'ALL' ? 'var(--cyan-300)' : urgencyColor[u]) : 'var(--text-muted)',
               }}
             >
               {u}
@@ -135,8 +135,8 @@ export default function CompaniesPage() {
                   <td style={{ padding: '12px 16px', fontSize: '12px', color: 'var(--text-secondary)' }}>{company.prefecture}</td>
                   <td style={{ padding: '12px 16px' }}>
                     <span style={{
-                      fontFamily: 'var(--font-jetbrains-mono)', fontSize: '15px', fontWeight: 800,
-                      color: company.score >= 80 ? 'var(--cyan)' : company.score >= 60 ? 'var(--amber)' : 'var(--red)',
+                      fontFamily: 'var(--font-mono)', fontSize: '15px', fontWeight: 800,
+                      color: company.score >= 80 ? 'var(--cyan-300)' : company.score >= 60 ? 'var(--amber)' : 'var(--red)',
                     }}>{company.score}</span>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
@@ -144,7 +144,7 @@ export default function CompaniesPage() {
                       fontSize: '10px', fontWeight: 700, color: urgencyColor[company.urgency],
                       background: `${urgencyColor[company.urgency]}18`,
                       borderWidth: '1px', borderStyle: 'solid', borderColor: `${urgencyColor[company.urgency]}40`,
-                      borderRadius: '4px', padding: '2px 7px', letterSpacing: '0.06em', fontFamily: 'var(--font-jetbrains-mono)',
+                      borderRadius: '4px', padding: '2px 7px', letterSpacing: '0.06em', fontFamily: 'var(--font-mono)',
                     }}>{company.urgency}</span>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
@@ -160,13 +160,13 @@ export default function CompaniesPage() {
                     </div>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
-                    <span style={{ fontFamily: 'var(--font-jetbrains-mono)', fontSize: '13px', color: 'var(--green)', fontWeight: 600 }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--green)', fontWeight: 600 }}>
                       {company.value}
                     </span>
                   </td>
                   <td style={{ padding: '12px 16px' }}>
                     <Link href={`/companies/${company.id}`} style={{
-                      fontSize: '11px', color: 'var(--cyan)', textDecoration: 'none',
+                      fontSize: '11px', color: 'var(--cyan-300)', textDecoration: 'none',
                       borderWidth: '1px', borderStyle: 'solid', borderColor: 'rgba(0,229,255,0.25)',
                       borderRadius: '4px', padding: '3px 8px', whiteSpace: 'nowrap',
                     }}>詳細 →</Link>
@@ -211,14 +211,14 @@ export default function CompaniesPage() {
               {[
                 { l: '業種', v: hoveredCompany.sector },
                 { l: '都道府県', v: hoveredCompany.prefecture },
-                { l: 'スコア', v: `${hoveredCompany.score}`, mono: true, color: 'var(--cyan)' },
+                { l: 'スコア', v: `${hoveredCompany.score}`, mono: true, color: 'var(--cyan-300)' },
                 { l: '価値', v: hoveredCompany.value, mono: true, color: 'var(--green)' },
               ].map(item => (
                 <div key={item.l}>
                   <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{item.l}</div>
                   <div style={{
                     fontSize: '12px', color: item.color || 'var(--text-secondary)',
-                    fontFamily: item.mono ? 'var(--font-jetbrains-mono)' : undefined,
+                    fontFamily: item.mono ? 'var(--font-mono)' : undefined,
                     fontWeight: item.mono ? 700 : 400,
                   }}>{item.v}</div>
                 </div>
