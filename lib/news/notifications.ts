@@ -28,6 +28,7 @@ export async function sendTelegram(message: string): Promise<boolean> {
           parse_mode: "Markdown",
           disable_web_page_preview: false,
         }),
+        signal: AbortSignal.timeout(10_000),
       }
     );
     return response.ok;
@@ -75,6 +76,7 @@ export async function sendWebhook(payload: Record<string, unknown>): Promise<boo
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10_000),
     });
     return response.ok;
   } catch (error) {
