@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useApp } from '@/lib/theme-context';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, Pencil, Check, X, Tag, ToggleLeft, ToggleRight } from 'lucide-react';
+import { formInputStyle as inputStyle, formSelectStyle as selectStyle } from '@/lib/styles';
 
 interface Keyword {
   id: number;
@@ -26,27 +27,6 @@ const PRIORITY_LABELS: Record<number, { en: string; ja: string; color: string }>
   3: { en: 'High', ja: '高', color: 'var(--red)' },
 };
 
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '9px 12px',
-  borderRadius: 8,
-  background: 'var(--bg-raised)',
-  border: '1px solid var(--border-default)',
-  color: 'var(--text-primary)',
-  fontSize: 13,
-  outline: 'none',
-  boxSizing: 'border-box',
-};
-
-const selectStyle: React.CSSProperties = {
-  padding: '9px 12px',
-  borderRadius: 8,
-  background: 'var(--bg-raised)',
-  border: '1px solid var(--border-default)',
-  color: 'var(--text-primary)',
-  fontSize: 13,
-  outline: 'none',
-};
 
 const btnBase: React.CSSProperties = {
   display: 'inline-flex',
