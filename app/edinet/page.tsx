@@ -113,6 +113,7 @@ export default function EdinetPage() {
       const params = new URLSearchParams({ limit: '100' });
       if (type !== 'ALL') params.set('type', type);
       const res = await fetch(`/api/edinet/signals?${params}`);
+      if (!res.ok) { setError('Failed to load signals'); return; }
       const data = await res.json() as { signals?: EdinetSignal[]; error?: string };
       if (data.error && data.error !== 'crawler backend offline') {
         setError(data.error);
