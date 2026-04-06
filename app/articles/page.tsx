@@ -64,20 +64,24 @@ export default function ArticlesPage() {
     let cancelled = false;
     const run = async () => {
       setLoading(true);
-      const params = new URLSearchParams({
-        page: String(page),
-        limit: String(limit),
-        ...(search && { search }),
-        ...(category && { category }),
-        ...(sentiment && { sentiment }),
-        ...(minScore > 0 && { minScore: String(minScore) }),
-      });
-      const res = await fetch(`/api/news/articles?${params}`);
-      const data = await res.json();
-      if (!cancelled) {
-        setArticles(data.articles || []);
-        setTotal(data.total || 0);
-        setLoading(false);
+      try {
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: String(limit),
+          ...(search && { search }),
+          ...(category && { category }),
+          ...(sentiment && { sentiment }),
+          ...(minScore > 0 && { minScore: String(minScore) }),
+        });
+        const res = await fetch(`/api/news/articles?${params}`);
+        if (!res.ok) return;
+        const data = await res.json() as { articles?: Article[]; total?: number };
+        if (!cancelled) {
+          setArticles(data.articles ?? []);
+          setTotal(data.total ?? 0);
+        }
+      } catch { /* silently ignore network errors */ } finally {
+        if (!cancelled) setLoading(false);
       }
     };
     run();
