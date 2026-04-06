@@ -41,7 +41,8 @@ export async function scrapeSource(sourceId: number, url: string, language = "en
 
       const content = item.content || item.contentSnippet || item.title;
       const author = item.creator || item.author || "Unknown";
-      const pubDate = item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString();
+      const rawDate = item.pubDate ? new Date(item.pubDate) : new Date();
+      const pubDate = isNaN(rawDate.getTime()) ? new Date().toISOString() : rawDate.toISOString();
 
       try {
         const result = insertArticle.run(
