@@ -73,7 +73,7 @@ export default function SentimentPage() {
 
   useEffect(() => {
     fetch('/api/news/sentiment')
-      .then(r => r.json())
+      .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (d && (d.timeline || d.overall)) setData({ ...MOCK_DATA, ...d });
       })

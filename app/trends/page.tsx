@@ -46,9 +46,9 @@ export default function TrendsPage() {
 
   useEffect(() => {
     fetch('/api/news/trends')
-      .then(r => r.json())
+      .then(r => r.ok ? r.json() : null)
       .then(d => {
-        const fetchedTrends = d.trends?.length ? d.trends.map((t: { topic: string; velocity: number; trend: string; predictedPeak: string | null; currentCount: number; counts: number[]; dates: string[] }) => ({
+        const fetchedTrends = d?.trends?.length ? d.trends.map((t: { topic: string; velocity: number; trend: string; predictedPeak: string | null; currentCount: number; counts: number[]; dates: string[] }) => ({
           term: t.topic,
           velocity: Math.round(t.velocity * 100),
           direction: t.trend || 'stable',
