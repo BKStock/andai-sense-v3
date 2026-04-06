@@ -192,9 +192,12 @@ JSONのみ返答してください。"""
         content = response['message']['content']
         # JSONを抽出
         import re
-        json_match = re.search(r'\{.*\}', content, re.DOTALL)
+        json_match = re.search(r'\{[^{}]*\}', content, re.DOTALL)
         if json_match:
-            return json.loads(json_match.group())
+            try:
+                return json.loads(json_match.group())
+            except json.JSONDecodeError:
+                pass
     except Exception as e:
         print(f"[AI] スコアリングエラー: {e}")
     
