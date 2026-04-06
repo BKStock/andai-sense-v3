@@ -48,7 +48,7 @@ export async function sendEmail(subject: string, html: string): Promise<boolean>
     const nodemailer = await import("nodemailer");
     const transporter = nodemailer.default.createTransport({
       host: SMTP_HOST,
-      port: parseInt(SMTP_PORT || "587"),
+      port: parseInt(SMTP_PORT || "587", 10),
       secure: SMTP_PORT === "465",
       auth: { user: SMTP_USER, pass: SMTP_PASS },
     });
