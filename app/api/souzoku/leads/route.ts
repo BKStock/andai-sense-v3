@@ -83,7 +83,7 @@ export async function POST(request: Request) {
         (deceased_id, property_address, property_type, estimated_value, lead_score)
       VALUES (?, ?, ?, ?, ?)
     `).run(
-      deceasedResult.lastInsertRowid,
+      Number(deceasedResult.lastInsertRowid),
       body.property_address ?? null,
       body.property_type ?? "不動産",
       body.estimated_value ?? 0,

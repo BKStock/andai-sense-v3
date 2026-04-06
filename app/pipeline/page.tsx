@@ -365,7 +365,8 @@ function PipelineStats({ cards }: { cards: PipelineCard[] }) {
   const totalValue = cards.reduce((sum, card) => {
     const company = companies.find(c => c.id === card.companyId);
     if (!company) return sum;
-    const val = parseFloat(company.value.replace(/[¥億]/g, ''));
+    const raw = company.value ? parseFloat(company.value.replace(/[¥億]/g, '')) : 0;
+    const val = isFinite(raw) ? raw : 0;
     return sum + val;
   }, 0);
 
