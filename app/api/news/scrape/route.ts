@@ -13,7 +13,8 @@ export async function POST() {
     const { total, errors } = await scrapeAllSources();
 
     const thresholdRow = db.prepare("SELECT value FROM settings WHERE key = 'score_threshold'").get() as { value: string } | undefined;
-    const threshold = parseInt(thresholdRow?.value ?? "70", 10);
+    const rawThreshold = parseInt(thresholdRow?.value ?? "70", 10);
+    const threshold = Math.max(0, Math.min(100, isNaN(rawThreshold) ? 70 : rawThreshold));
 
     const unscoredArticles = db.prepare(`
       SELECT id, title, content FROM articles 

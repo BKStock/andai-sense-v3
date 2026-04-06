@@ -15,7 +15,8 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search") || "";
     const category = searchParams.get("category") || "";
     const sentiment = searchParams.get("sentiment") || "";
-    const minScore = parseInt(searchParams.get("minScore") || "0");
+    const rawMinScore = parseInt(searchParams.get("minScore") || "0", 10);
+    const minScore = Math.max(0, Math.min(100, isNaN(rawMinScore) ? 0 : rawMinScore));
     const offset = (page - 1) * limit;
 
     let where = "WHERE 1=1";
