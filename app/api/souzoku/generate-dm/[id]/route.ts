@@ -55,6 +55,8 @@ export async function POST(
       if (typeof data.response === 'string') {
         dmText = data.response.trim().slice(0, 400);
       }
+    } else {
+      console.warn(`[generate-dm] Ollama returned ${res.status}, using fallback`);
     }
   } catch {
     // Ollama unavailable — use fallback

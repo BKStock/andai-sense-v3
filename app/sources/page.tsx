@@ -154,21 +154,31 @@ export default function SourcesPage() {
 
   const handleDelete = async (id: number) => {
     if (!confirm(L.deleteConfirm)) return;
-    await fetch('/api/news/sources', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-    fetchSources();
+    try {
+      const res = await fetch('/api/news/sources', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) { setError(lang === 'ja' ? '削除に失敗しました' : 'Delete failed'); return; }
+      await fetchSources();
+    } catch {
+      setError(lang === 'ja' ? 'ネットワークエラー' : 'Network error');
+    }
   };
 
   const handleToggle = async (s: Source) => {
-    await fetch('/api/news/sources', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: s.id, enabled: s.enabled ? 0 : 1 }),
-    });
-    fetchSources();
+    try {
+      const res = await fetch('/api/news/sources', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: s.id, enabled: s.enabled ? 0 : 1 }),
+      });
+      if (!res.ok) { setError(lang === 'ja' ? '変更に失敗しました' : 'Update failed'); return; }
+      await fetchSources();
+    } catch {
+      setError(lang === 'ja' ? 'ネットワークエラー' : 'Network error');
+    }
   };
 
   const handleFetchNow = async (s: Source) => {
