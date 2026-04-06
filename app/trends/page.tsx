@@ -39,7 +39,7 @@ function isPeakSoon(predictedPeak: string | null): boolean {
 }
 
 export default function TrendsPage() {
-  const { t, lang } = useApp();
+  const { lang } = useApp();
   const [trends, setTrends] = useState<TrendTopic[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);

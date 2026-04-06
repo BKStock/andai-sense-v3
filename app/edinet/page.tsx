@@ -98,7 +98,7 @@ function SkeletonRow() {
 }
 
 export default function EdinetPage() {
-  const { t, lang } = useApp();
+  const { lang } = useApp();
   const [signals, setSignals] = useState<EdinetSignal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -125,7 +125,7 @@ export default function EdinetPage() {
     }
   }, [filter]);
 
-  useEffect(() => { fetchSignals(filter); }, [filter]);
+  useEffect(() => { fetchSignals(filter); }, [filter, fetchSignals]);
 
   const handleRefresh = async () => {
     setRefreshing(true);

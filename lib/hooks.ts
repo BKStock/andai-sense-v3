@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { getRandomSignal } from '@/lib/mock-data';
 
 export function useCountUp(target: number, duration: number = 1500, start: boolean = true) {
   const [value, setValue] = useState(0);
@@ -26,21 +27,17 @@ export function useCountUp(target: number, duration: number = 1500, start: boole
 }
 
 export function useLiveFeed() {
+  // Lazy init: compute initial signals once, no setState in effect
   const [signals, setSignals] = useState<Array<{
     id: number;
     timestamp: string;
     company: string;
     signal: string;
     severity: number;
-  }>>([]);
+  }>>(() => Array.from({ length: 8 }, () => getRandomSignal()));
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    const { getRandomSignal } = require('@/lib/mock-data');
-    // Initial signals
-    const initial = Array.from({ length: 8 }, () => getRandomSignal());
-    setSignals(initial);
-
     const addSignal = () => {
       if (!isPaused) {
         setSignals(prev => {

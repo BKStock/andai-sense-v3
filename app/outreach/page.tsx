@@ -16,7 +16,6 @@ const tabs: { key: TabKey; label: string; count: number; dot?: boolean }[] = [
 export default function OutreachCenter() {
   const [activeTab, setActiveTab] = useState<TabKey>('draft');
   const [confirmModal, setConfirmModal] = useState<string | null>(null);
-  const [sentIds, setSentIds] = useState<Set<number>>(new Set());
 
   const handleSend = (company: string) => {
     setConfirmModal(company);

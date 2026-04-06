@@ -72,18 +72,22 @@ const AppContext = createContext<AppContextType>({
 })
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark')
-  const [lang, setLang] = useState<Lang>('ja')
-
-  useEffect(() => {
-    const savedTheme = (localStorage.getItem('theme') as Theme) ||
+  // Lazy init: read from localStorage once, no setState in effect
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === 'undefined') return 'dark'
+    return (localStorage.getItem('theme') as Theme) ||
       (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
-    const savedLang = (localStorage.getItem('lang') as Lang) || 'ja'
-    setTheme(savedTheme)
-    setLang(savedLang)
-    document.documentElement.setAttribute('data-theme', savedTheme)
-    document.documentElement.lang = savedLang
-  }, [])
+  })
+  const [lang, setLang] = useState<Lang>(() => {
+    if (typeof window === 'undefined') return 'ja'
+    return (localStorage.getItem('lang') as Lang) || 'ja'
+  })
+
+  // Sync DOM on mount
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.lang = lang
+  }, [theme, lang])
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark'

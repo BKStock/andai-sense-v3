@@ -67,7 +67,7 @@ function SentimentTrend({ value }: { value: number }) {
 }
 
 export default function SentimentPage() {
-  const { t, lang } = useApp();
+  const { lang } = useApp();
   const [data, setData] = useState<SentimentData>(MOCK_DATA);
   const [range, setRange] = useState<'7d' | '30d'>('7d');
 

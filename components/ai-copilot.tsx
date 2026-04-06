@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 
 export function AICopilot() {
   const [command, setCommand] = useState('')
@@ -18,14 +18,14 @@ export function AICopilot() {
         model: 'claude-haiku-4-5',
         apiKey: process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || '',
         baseURL: 'https://api.anthropic.com',
-        language: 'ja' as any,
-      } as any)
-      
+      })
+
       setLogs(prev => [...prev, '🔍 ページを解析中...'])
       await agent.execute(command)
       setLogs(prev => [...prev, '✅ 完了！'])
-    } catch (e: any) {
-      setLogs(prev => [...prev, `⚠️ APIキーを設定してください: ${e.message?.slice(0,50)}`])
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message?.slice(0, 50) : String(e)
+      setLogs(prev => [...prev, `⚠️ APIキーを設定してください: ${msg}`])
     } finally {
       setIsRunning(false)
       setCommand('')

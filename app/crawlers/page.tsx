@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Play, Pause, RefreshCw, Globe, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, Play, Pause, RefreshCw, Globe, AlertCircle, Clock, Wifi, WifiOff } from 'lucide-react';
 
 interface Crawler {
   id: number;
@@ -15,7 +15,14 @@ interface Crawler {
   interval: string;
 }
 
-const initialCrawlers: Crawler[] = [
+interface BackendStatus {
+  online: boolean;
+  total_companies?: number;
+  recent_runs?: Array<{ target: string; status: string; started_at: string; items_found: number; finished_at?: string }>;
+  targets?: Array<{ name: string; url: string }>;
+}
+
+const INITIAL_CRAWLERS: Crawler[] = [
   { id: 1, name: '国税庁 滞納公告', url: 'https://www.nta.go.jp/', type: '税務', status: 'running', lastRun: '5分前', signalsFound: 23, interval: '毎時' },
   { id: 2, name: 'バトンズ 事業売却', url: 'https://batonz.jp/', type: 'M&A市場', status: 'running', lastRun: '12分前', signalsFound: 8, interval: '30分毎' },
   { id: 3, name: '東京商工リサーチ', url: 'https://www.tsr-net.co.jp/', type: '信用情報', status: 'paused', lastRun: '2時間前', signalsFound: 45, interval: '日次' },
@@ -45,23 +52,101 @@ const statusIcon: Record<Crawler['status'], React.ReactNode> = {
   idle: <Clock size={12} />,
 };
 
+function formatRelativeTime(dateStr: string | null): string {
+  if (!dateStr) return '—';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (diff < 60) return `${diff}秒前`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}分前`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}時間前`;
+  return `${Math.floor(diff / 86400)}日前`;
+}
+
 export default function CrawlersPage() {
-  const [crawlers, setCrawlers] = useState<Crawler[]>(initialCrawlers);
+  const [crawlers, setCrawlers] = useState<Crawler[]>(INITIAL_CRAWLERS);
+  const [backendStatus, setBackendStatus] = useState<BackendStatus>({ online: false });
   const [showAdd, setShowAdd] = useState(false);
   const [newName, setNewName] = useState('');
   const [newUrl, setNewUrl] = useState('');
   const [newType, setNewType] = useState('');
-  const [newInterval, setNewInterval] = useState('日次');
+  const [newInterval] = useState('日次');
+  const [togglingId, setTogglingId] = useState<number | null>(null);
 
   const totalSignals = crawlers.reduce((a, c) => a + c.signalsFound, 0);
   const runningCount = crawlers.filter(c => c.status === 'running').length;
   const errorCount = crawlers.filter(c => c.status === 'error').length;
 
-  const toggleStatus = (id: number) => {
-    setCrawlers(prev => prev.map(c => {
-      if (c.id !== id) return c;
-      return { ...c, status: c.status === 'running' ? 'paused' : 'running' };
-    }));
+  const fetchBackendStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/crawlers', { cache: 'no-store' });
+      if (res.ok) {
+        const raw = (await res.json()) as Record<string, unknown>;
+        const isOnline = !raw['error'];
+        const data: BackendStatus = {
+          online: isOnline,
+          total_companies: raw['total_companies'] as number | undefined,
+          recent_runs: raw['recent_runs'] as BackendStatus['recent_runs'],
+          targets: raw['targets'] as BackendStatus['targets'],
+        };
+        setBackendStatus(data);
+
+        // Merge backend run info into crawler list
+        if (data.recent_runs && data.recent_runs.length > 0) {
+          setCrawlers(prev => prev.map(c => {
+            const run = data.recent_runs!.find(r => r.target === c.name || c.name.includes(r.target));
+            if (!run) return c;
+            return {
+              ...c,
+              lastRun: formatRelativeTime(run.finished_at ?? run.started_at),
+              signalsFound: run.items_found ?? c.signalsFound,
+              status: run.status === 'running' ? 'running' : run.status === 'error' ? 'error' : 'idle',
+            };
+          }));
+        }
+      } else {
+        setBackendStatus({ online: false });
+      }
+    } catch {
+      setBackendStatus({ online: false });
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBackendStatus();
+    const interval = setInterval(fetchBackendStatus, 30_000);
+    return () => clearInterval(interval);
+  }, [fetchBackendStatus]);
+
+  const toggleStatus = async (crawler: Crawler) => {
+    const newStatus = crawler.status === 'running' ? 'paused' : 'running';
+
+    // Optimistic update
+    setCrawlers(prev => prev.map(c => c.id === crawler.id ? { ...c, status: newStatus } : c));
+    setTogglingId(crawler.id);
+
+    try {
+      const encodedName = encodeURIComponent(crawler.name);
+      const res = await fetch(`/api/crawlers/${encodedName}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: newStatus === 'running' ? 'start' : 'stop' }),
+      });
+
+      if (res.ok) {
+        const data = (await res.json()) as { status?: Crawler['status'] };
+        if (data.status) {
+          setCrawlers(prev => prev.map(c => c.id === crawler.id ? { ...c, status: data.status! } : c));
+        }
+      } else {
+        // Revert on failure (backend offline)
+        setCrawlers(prev => prev.map(c => c.id === crawler.id ? { ...c, status: crawler.status } : c));
+      }
+    } catch {
+      setCrawlers(prev => prev.map(c => c.id === crawler.id ? { ...c, status: crawler.status } : c));
+    } finally {
+      setTogglingId(null);
+    }
   };
 
   const addCrawler = () => {
@@ -84,23 +169,39 @@ export default function CrawlersPage() {
             データ収集エンジン
           </p>
         </div>
-        <button
-          onClick={() => setShowAdd(true)}
-          style={{
-            display: 'flex', alignItems: 'center', gap: '7px',
-            padding: '9px 16px', borderRadius: '8px', cursor: 'pointer',
-            background: 'rgba(0,229,255,0.12)', border: '1px solid rgba(0,229,255,0.3)',
-            color: 'var(--cyan)', fontSize: '12px', fontWeight: 600,
-          }}
-        >
-          <Plus size={13} /> 追加
-        </button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {/* Backend status */}
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            fontSize: 10, fontWeight: 600, fontFamily: 'var(--font-mono)',
+            padding: '4px 10px', borderRadius: 12,
+            background: backendStatus.online ? 'rgba(0,255,136,0.1)' : 'rgba(255,59,59,0.1)',
+            border: `1px solid ${backendStatus.online ? 'rgba(0,255,136,0.3)' : 'rgba(255,59,59,0.3)'}`,
+            color: backendStatus.online ? 'var(--green)' : 'var(--red)',
+          }}>
+            {backendStatus.online ? <Wifi size={10} /> : <WifiOff size={10} />}
+            {backendStatus.online
+              ? `Backend Online · ${backendStatus.total_companies ?? 0} companies`
+              : 'Backend Offline'}
+          </span>
+          <button
+            onClick={() => setShowAdd(true)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '7px',
+              padding: '9px 16px', borderRadius: '8px', cursor: 'pointer',
+              background: 'rgba(0,229,255,0.12)', border: '1px solid rgba(0,229,255,0.3)',
+              color: 'var(--cyan-300)', fontSize: '12px', fontWeight: 600,
+            }}
+          >
+            <Plus size={13} /> 追加
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
         {[
-          { label: '総クローラー', value: crawlers.length, color: 'var(--cyan)' },
+          { label: '総クローラー', value: crawlers.length, color: 'var(--cyan-300)' },
           { label: '稼働中', value: runningCount, color: 'var(--green)' },
           { label: 'エラー', value: errorCount, color: 'var(--red)' },
           { label: '検出シグナル総計', value: totalSignals, color: 'var(--amber)' },
@@ -113,7 +214,7 @@ export default function CrawlersPage() {
               {stat.label}
             </div>
             <div style={{
-              fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-jetbrains-mono)',
+              fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-mono)',
               color: stat.color,
             }}>
               {stat.value}
@@ -150,7 +251,7 @@ export default function CrawlersPage() {
                 <label style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>種別</label>
                 <input value={newType} onChange={e => setNewType(e.target.value)} placeholder="税務・採用など" style={{ width: '100%', background: 'var(--bg-raised)', border: '1px solid var(--border-default)', borderRadius: '6px', padding: '8px 10px', fontSize: '12px', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box' }} />
               </div>
-              <button onClick={addCrawler} style={{ padding: '9px 16px', borderRadius: '6px', cursor: 'pointer', background: 'rgba(0,229,255,0.15)', border: '1px solid rgba(0,229,255,0.3)', color: 'var(--cyan)', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+              <button onClick={addCrawler} style={{ padding: '9px 16px', borderRadius: '6px', cursor: 'pointer', background: 'rgba(0,229,255,0.15)', border: '1px solid rgba(0,229,255,0.3)', color: 'var(--cyan-300)', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                 追加
               </button>
             </div>
@@ -184,7 +285,7 @@ export default function CrawlersPage() {
                   </div>
                 </td>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-jetbrains-mono)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                     {crawler.url.replace('https://', '').slice(0, 25)}
                   </span>
                 </td>
@@ -196,7 +297,7 @@ export default function CrawlersPage() {
                     background: `${statusColor[crawler.status]}15`,
                     border: `1px solid ${statusColor[crawler.status]}40`,
                     borderRadius: '4px', padding: '2px 8px',
-                    fontFamily: 'var(--font-jetbrains-mono)',
+                    fontFamily: 'var(--font-mono)',
                   }}>
                     {statusIcon[crawler.status]}
                     {statusLabel[crawler.status]}
@@ -204,22 +305,30 @@ export default function CrawlersPage() {
                 </td>
                 <td style={{ padding: '12px 14px', fontSize: '11px', color: 'var(--text-muted)' }}>{crawler.lastRun}</td>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontFamily: 'var(--font-jetbrains-mono)', fontSize: '13px', fontWeight: 700, color: 'var(--cyan)' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700, color: 'var(--cyan-300)' }}>
                     {crawler.signalsFound}
                   </span>
                 </td>
                 <td style={{ padding: '12px 14px', fontSize: '11px', color: 'var(--text-secondary)' }}>{crawler.interval}</td>
                 <td style={{ padding: '12px 14px' }}>
                   <button
-                    onClick={() => toggleStatus(crawler.id)}
+                    onClick={() => toggleStatus(crawler)}
+                    disabled={togglingId === crawler.id}
                     style={{
                       background: 'none', border: '1px solid var(--border-default)',
-                      borderRadius: '5px', padding: '4px 10px', cursor: 'pointer',
+                      borderRadius: '5px', padding: '4px 10px', cursor: togglingId === crawler.id ? 'not-allowed' : 'pointer',
                       color: crawler.status === 'running' ? 'var(--amber)' : 'var(--green)',
                       fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px',
+                      opacity: togglingId === crawler.id ? 0.6 : 1,
+                      transition: 'opacity 150ms',
                     }}
                   >
-                    {crawler.status === 'running' ? <><Pause size={10} /> 停止</> : <><Play size={10} /> 起動</>}
+                    {togglingId === crawler.id
+                      ? <RefreshCw size={10} style={{ animation: 'spin 1s linear infinite' }} />
+                      : crawler.status === 'running'
+                        ? <><Pause size={10} /> 停止</>
+                        : <><Play size={10} /> 起動</>
+                    }
                   </button>
                 </td>
               </motion.tr>
@@ -227,6 +336,18 @@ export default function CrawlersPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Backend info */}
+      {!backendStatus.online && (
+        <div style={{
+          padding: '12px 16px', borderRadius: 8,
+          background: 'rgba(255,184,0,0.08)', border: '1px solid rgba(255,184,0,0.25)',
+          color: 'var(--amber)', fontSize: 12,
+        }}>
+          ⚠️ クローラーバックエンドがオフラインです。<code style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}>crawler_backend/start.sh</code> を実行してください。
+          バックエンドが起動しているとき、起動/停止ボタンが実際のAPIに接続されます。
+        </div>
+      )}
 
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

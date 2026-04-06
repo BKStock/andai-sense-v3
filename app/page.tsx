@@ -2,17 +2,85 @@
 import { useCountUp, useLiveFeed } from '@/lib/hooks';
 import { companies, signalColors, urgencyColors } from '@/lib/mock-data';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Wifi, WifiOff } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+interface DashboardStats {
+  alerts_today: number;
+  urgent_cases: number;
+  entities: number;
+  signals: number;
+  crawler_online: boolean;
+}
+
+function useStats() {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [crawlerOnline, setCrawlerOnline] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/stats');
+        if (res.ok) {
+          const data = (await res.json()) as DashboardStats;
+          setStats(data);
+          setCrawlerOnline(data.crawler_online);
+        }
+      } catch {
+        // Silently fall back to defaults
+      }
+    };
+
+    fetchStats();
+
+    // Poll crawler health every 30s
+    const healthInterval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/health');
+        if (res.ok) {
+          const data = (await res.json()) as { online: boolean };
+          setCrawlerOnline(data.online);
+        }
+      } catch {
+        setCrawlerOnline(false);
+      }
+    }, 30_000);
+
+    return () => clearInterval(healthInterval);
+  }, []);
+
+  return { stats, crawlerOnline };
+}
+
+function CrawlerBadge({ online }: { online: boolean | null }) {
+  if (online === null) return null;
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      fontSize: 10, fontWeight: 600, fontFamily: 'var(--font-mono)',
+      padding: '3px 10px', borderRadius: 12,
+      background: online ? 'rgba(0,255,136,0.1)' : 'rgba(255,59,59,0.1)',
+      border: `1px solid ${online ? 'rgba(0,255,136,0.3)' : 'rgba(255,59,59,0.3)'}`,
+      color: online ? 'var(--green)' : 'var(--red)',
+    }}>
+      {online ? <Wifi size={10} /> : <WifiOff size={10} />}
+      {online ? 'Crawler Online' : 'Crawler Offline'}
+    </span>
+  );
+}
+
+// Pre-computed stable blip positions (deterministic, outside component)
+const RADAR_BLIPS = Array.from({ length: 10 }, (_, i) => ({
+  id: i,
+  x: 50 + ((i * 37 + 13) % 70) - 35,
+  y: 50 + ((i * 53 + 7) % 70) - 35,
+  delay: (i * 0.23) % 2,
+  size: 2 + (i % 3),
+}));
 
 function Radar() {
-  const blips = Array.from({ length: 10 }, (_, i) => ({
-    id: i,
-    x: 50 + (Math.random() - 0.5) * 70,
-    y: 50 + (Math.random() - 0.5) * 70,
-    delay: Math.random() * 2,
-    size: 2 + Math.random() * 3,
-  }));
+  const blips = RADAR_BLIPS;
 
   return (
     <div style={{ position: 'relative', width: '100%', height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -83,11 +151,7 @@ function LiveFeed() {
     <div
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      style={{
-        height: 500,
-        overflowY: 'auto',
-        overflowX: 'hidden',
-      }}
+      style={{ height: 500, overflowY: 'auto', overflowX: 'hidden' }}
     >
       <div style={{
         fontSize: 12, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)',
@@ -101,12 +165,8 @@ function LiveFeed() {
           initial={i === 0 ? { opacity: 0, y: -10 } : false}
           animate={{ opacity: 1, y: 0 }}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '8px 0',
-            borderBottom: '1px solid var(--border-default)',
-            fontSize: 12,
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '8px 0', borderBottom: '1px solid var(--border-default)', fontSize: 12,
           }}
         >
           <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', fontSize: 11, flexShrink: 0 }}>
@@ -140,19 +200,27 @@ function LiveFeed() {
 
 export default function DashboardHome() {
   const sorted = [...companies].sort((a, b) => b.score - a.score);
+  const { stats, crawlerOnline } = useStats();
 
   return (
     <div>
+      {/* Crawler status badge */}
+      {crawlerOnline !== null && (
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
+          <CrawlerBadge online={crawlerOnline} />
+        </div>
+      )}
+
       {/* Hero */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
         <div className="card" style={{ padding: 24 }}>
           <Radar />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <StatCard value={127} label="Alerts Today" color="var(--cyan-300)" />
-          <StatCard value={8} label="Urgent Cases" color="var(--red)" glow />
-          <StatCard value={45821} label="Entities" color="var(--cyan-300)" />
-          <StatCard value={1847} label="Signals" color="var(--cyan-300)" />
+          <StatCard value={stats?.alerts_today ?? 127} label="Alerts Today" color="var(--cyan-300)" />
+          <StatCard value={stats?.urgent_cases ?? 8} label="Urgent Cases" color="var(--red)" glow />
+          <StatCard value={stats?.entities ?? 45821} label="Entities" color="var(--cyan-300)" />
+          <StatCard value={stats?.signals ?? 1847} label="Signals" color="var(--cyan-300)" />
         </div>
       </div>
 
@@ -164,12 +232,8 @@ export default function DashboardHome() {
         style={{
           background: 'rgba(255, 59, 59, 0.12)',
           border: '1px solid rgba(255, 59, 59, 0.3)',
-          borderRadius: 12,
-          padding: '14px 24px',
-          marginBottom: 24,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          borderRadius: 12, padding: '14px 24px', marginBottom: 24,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -188,8 +252,7 @@ export default function DashboardHome() {
         {/* Company Table */}
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           <div style={{
-            padding: '16px 24px',
-            borderBottom: '1px solid var(--border-default)',
+            padding: '16px 24px', borderBottom: '1px solid var(--border-default)',
             fontSize: 12, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)',
             letterSpacing: '0.1em', textTransform: 'uppercase',
           }}>
@@ -218,8 +281,7 @@ export default function DashboardHome() {
                   style={{
                     borderLeft: `3px solid ${urgencyColors[c.urgency]}`,
                     borderBottom: '1px solid var(--border-default)',
-                    cursor: 'pointer',
-                    transition: 'background 200ms',
+                    cursor: 'pointer', transition: 'background 200ms',
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}

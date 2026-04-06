@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { companies, urgencyColors } from '@/lib/mock-data';
+import { companies } from '@/lib/mock-data';
 import { useCountUp } from '@/lib/hooks';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Zap } from 'lucide-react';

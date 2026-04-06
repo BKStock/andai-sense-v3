@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Search, Home, Building2, Map, Target, Mail, Lightbulb, BarChart3, Settings, Bell } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { companies } from '@/lib/mock-data';
@@ -35,10 +35,15 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
     c.label.includes(query) || query === ''
   );
 
-  const allItems = [
-    ...filteredCompanies.map(c => ({ type: 'company' as const, id: c.id, label: c.name, sub: `${c.sector} · ${c.prefecture}`, action: `/companies/${c.id}` })),
-    ...filteredCommands.map(c => ({ type: 'command' as const, id: c.label, label: c.label, sub: '', action: c.action })),
-  ];
+  const allItems = useMemo(() => [
+    ...companies
+      .filter(c => c.name.includes(query) || c.sector.includes(query) || c.prefecture.includes(query))
+      .slice(0, 5)
+      .map(c => ({ type: 'company' as const, id: c.id, label: c.name, sub: `${c.sector} · ${c.prefecture}`, action: `/companies/${c.id}` })),
+    ...commands
+      .filter(c => c.label.includes(query) || query === '')
+      .map(c => ({ type: 'command' as const, id: c.label, label: c.label, sub: '', action: c.action })),
+  ], [query]);
 
   const handleSelect = useCallback((action: string) => {
     router.push(action);
@@ -46,9 +51,7 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
     setQuery('');
   }, [router, onClose]);
 
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
+  // Intentionally reset selection when query changes — handled in onChange
 
   useEffect(() => {
     if (!open) return;
@@ -120,7 +123,7 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
               <input
                 autoFocus
                 value={query}
-                onChange={e => setQuery(e.target.value)}
+                onChange={e => { setQuery(e.target.value); setSelectedIndex(0); }}
                 placeholder="企業名、コマンドを検索..."
                 style={{
                   flex: 1,

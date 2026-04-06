@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useApp } from '@/lib/theme-context';
 import { ScoreBadge } from '@/components/news/ScoreBadge';
 import { SentimentBadge } from '@/components/news/SentimentBadge';
@@ -58,7 +58,7 @@ const selectStyle: React.CSSProperties = {
 };
 
 export default function ArticlesPage() {
-  const { t, lang } = useApp();
+  const { lang } = useApp();
   const [articles, setArticles] = useState<Article[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -70,24 +70,29 @@ export default function ArticlesPage() {
   const [showFilters, setShowFilters] = useState(false);
   const limit = 20;
 
-  const fetchArticles = useCallback(async () => {
-    setLoading(true);
-    const params = new URLSearchParams({
-      page: String(page),
-      limit: String(limit),
-      ...(search && { search }),
-      ...(category && { category }),
-      ...(sentiment && { sentiment }),
-      ...(minScore > 0 && { minScore: String(minScore) }),
-    });
-    const res = await fetch(`/api/news/articles?${params}`);
-    const data = await res.json();
-    setArticles(data.articles || []);
-    setTotal(data.total || 0);
-    setLoading(false);
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+        ...(search && { search }),
+        ...(category && { category }),
+        ...(sentiment && { sentiment }),
+        ...(minScore > 0 && { minScore: String(minScore) }),
+      });
+      const res = await fetch(`/api/news/articles?${params}`);
+      const data = await res.json();
+      if (!cancelled) {
+        setArticles(data.articles || []);
+        setTotal(data.total || 0);
+        setLoading(false);
+      }
+    };
+    run();
+    return () => { cancelled = true; };
   }, [page, search, category, sentiment, minScore]);
-
-  useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
   const totalPages = Math.ceil(total / limit);
 
