@@ -365,7 +365,7 @@ async def get_companies(limit: int = 50, min_score: int = 0, sector: str = ""):
         query += " AND sector = ?"
         params.append(sector)
     
-    query += " ORDER BY score DESC, crawled_at DESC LIMIT ?"
+    query += " ORDER BY score DESC, last_updated DESC LIMIT ?"
     params.append(limit)
     
     rows = [dict(r) for r in conn.execute(query, params).fetchall()]
