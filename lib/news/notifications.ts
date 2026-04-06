@@ -122,7 +122,8 @@ export async function notifyArticle(article: Article): Promise<void> {
           timestamp: new Date().toISOString(),
         });
       }
-    } catch {
+    } catch (err) {
+      console.error(`[notifyArticle] ${channel} notification failed for article ${article.id}:`, err);
       success = false;
     }
 
