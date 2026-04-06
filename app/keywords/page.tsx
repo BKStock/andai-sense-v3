@@ -202,8 +202,10 @@ export default function KeywordsPage() {
   const startEdit = (kw: Keyword) => {
     setEditId(kw.id);
     setShowAdd(false);
-    const related = JSON.parse(kw.related_terms || '[]') as string[];
-    const excluded = JSON.parse(kw.exclude_terms || '[]') as string[];
+    let related: string[] = [];
+    let excluded: string[] = [];
+    try { related = JSON.parse(kw.related_terms || '[]') as string[]; } catch { related = []; }
+    try { excluded = JSON.parse(kw.exclude_terms || '[]') as string[]; } catch { excluded = []; }
     setForm({
       term: kw.term,
       category: kw.category,
