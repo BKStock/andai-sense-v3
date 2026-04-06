@@ -86,7 +86,7 @@ export default function CrawlersPage() {
         // Merge backend run info into crawler list
         if (data.recent_runs && data.recent_runs.length > 0) {
           setCrawlers(prev => prev.map(c => {
-            const run = data.recent_runs!.find(r => r.target === c.name || c.name.includes(r.target));
+            const run = data.recent_runs!.find(r => r.target === c.name);
             if (!run) return c;
             return {
               ...c,
