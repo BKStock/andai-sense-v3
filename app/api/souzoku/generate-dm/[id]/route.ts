@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/news/db";
+import { OLLAMA_BASE } from "@/lib/config";
 
 interface LeadRow {
   property_address: string | null;
@@ -38,7 +39,7 @@ export async function POST(
 
   let dmText = "";
   try {
-    const res = await fetch("http://localhost:11434/api/generate", {
+    const res = await fetch(`${OLLAMA_BASE}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

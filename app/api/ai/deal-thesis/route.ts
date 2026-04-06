@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { OLLAMA_BASE } from '@/lib/config';
 
 interface CompanyData {
   name: string;
@@ -60,7 +61,7 @@ M&Aスコア: ${company.score}/100
 【次のステップ】`;
 
   try {
-    const response = await fetch('http://localhost:11434/api/generate', {
+    const response = await fetch(`${OLLAMA_BASE}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
